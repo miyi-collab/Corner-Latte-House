@@ -62,15 +62,15 @@
     <div class="cart-modal" id="options-modal">
         <div class="cart-content">
             <span class="close-btn" onclick="closeOptionsModal()">&times;</span>
-            <h3 id="modal-product-title">Selecciona tu opción</h3>
+            <h3 id="modal-product-title">Confirma tu producto</h3>
             <p id="modal-product-desc" style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;"></p>
             
             <div id="options-container" style="margin-bottom: 1.5rem;">
                 <!-- Opciones inyectadas dinámicamente -->
             </div>
 
-            <button class="whatsapp-btn" style="background-color: var(--dark-brown);" onclick="confirmAddWithOptions()">
-                Agregar al pedido
+            <button class="whatsapp-btn" style="background-color: var(--dark-brown);" onclick="confirmAddToCart()">
+                Confirmar y agregar
             </button>
         </div>
     </div>
@@ -89,7 +89,6 @@
             <div id="cart-items-list" class="cart-items-list">
                 <!-- Items seleccionados -->
             </div>
-
             <!-- Opciones de Envío / Recoger -->
             <div class="delivery-options" style="margin: 1rem 0; font-size: 0.9rem;">
                 <label style="font-weight: 500; color: var(--dark-brown); display: block; margin-bottom: 0.5rem;">Método de entrega:</label>
@@ -101,7 +100,13 @@
                     📍 <strong>Ubicación:</strong> Corner Latte House (Consulta nuestra dirección exacta por WhatsApp).
                 </div>
             </div>
-
+            <div class="payment-options">
+                <label class="payment-options-title">Método de pago:</label>
+                <div class="payment-options-list">
+                    <label><input type="radio" name="paymentMethod" value="efectivo" checked> Efectivo</label>
+                    <label><input type="radio" name="paymentMethod" value="transferencia"> Transferencia</label>
+                </div>
+            </div>
             <div class="cart-total" id="cart-total-container">
                 <!-- Se actualiza dinámicamente -->
             </div>
@@ -111,6 +116,7 @@
             </button>
         </div>
     </div>
+    <div id="cart-confirmation" class="cart-confirmation" role="status" aria-live="polite"></div>
     
     <!-- Footer -->
     <footer>

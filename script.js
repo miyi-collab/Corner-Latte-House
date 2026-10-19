@@ -166,27 +166,52 @@ function filterMenu(category, selectedTab) {
 
 function handleAddToCartClick(id) {
     const product = products.find(p => p.id === id);
-
-    if (product.options && product.options.length > 0) {
-        currentProductToConfigure = product;
-        showOptionsModal(product);
-    } else {
-        addToCart(product, "Estándar");
-    }
+    currentProductToConfigure = product;
+    showOptionsModal(product);
 }
 
 function showOptionsModal(product) {
     const modal = document.getElementById("options-modal");
     document.getElementById("modal-product-title").textContent = product.name;
-    document.getElementById("modal-product-desc").textContent = "Por favor selecciona tu variante preferida:";
+    document.getElementById("modal-product-desc").textContent = product.options?.length
+        ? "Selecciona una opción y la cantidad para confirmar tu producto."
+        : "Elige la cantidad y confirma para agregar este producto a tu pedido.";
 
     const container = document.getElementById("options-container");
-    container.innerHTML = `
-        <label style="font-size:0.9rem; font-weight:500; color:var(--dark-brown);">Opción:</label>
-        <select id="selected-product-option" class="option-select">
-            ${product.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-        </select>
-    `;
+    container.innerHTML = "";
+
+    if (product.options?.length) {
+        const optionLabel = document.createElement("label");
+        optionLabel.htmlFor = "selected-product-option";
+        optionLabel.textContent = "Opción:";
+        container.appendChild(optionLabel);
+
+        const optionSelect = document.createElement("select");
+        optionSelect.id = "selected-product-option";
+        optionSelect.className = "option-select";
+        product.options.forEach(option => {
+            const optionElement = document.createElement("option");
+            optionElement.value = option;
+            optionElement.textContent = option;
+            optionSelect.appendChild(optionElement);
+        });
+        container.appendChild(optionSelect);
+    }
+
+    const quantityLabel = document.createElement("label");
+    quantityLabel.htmlFor = "selected-product-quantity";
+    quantityLabel.className = "quantity-label";
+    quantityLabel.textContent = "Cantidad:";
+
+    const quantityInput = document.createElement("input");
+    quantityInput.id = "selected-product-quantity";
+    quantityInput.className = "quantity-input";
+    quantityInput.type = "number";
+    quantityInput.min = "1";
+    quantityInput.max = "99";
+    quantityInput.value = "1";
+    quantityInput.inputMode = "numeric";
+    container.append(quantityLabel, quantityInput);
 
     modal.style.display = "flex";
 }
@@ -196,23 +221,41 @@ function closeOptionsModal() {
     currentProductToConfigure = null;
 }
 
-function confirmAddWithOptions() {
+function confirmAddToCart() {
     if (!currentProductToConfigure) return;
-    const selectedOption = document.getElementById("selected-product-option").value;
-    addToCart(currentProductToConfigure, selectedOption);
+    const optionSelect = document.getElementById("selected-product-option");
+    const variant = optionSelect ? optionSelect.value : "Estándar";
+    const quantity = parseQuantity(document.getElementById("selected-product-quantity").value);
+    addToCart(currentProductToConfigure, variant, quantity);
     closeOptionsModal();
+    showCartConfirmation(`${quantity} ${quantity === 1 ? "producto agregado" : "productos agregados"} al carrito.`);
 }
 
-function addToCart(product, variant) {
+function addToCart(product, variant, quantity = 1) {
     const fullName = variant !== "Estándar" ? `${product.name} (${variant})` : product.name;
     const existing = cart.find(item => item.fullName === fullName);
 
     if (existing) {
-        existing.quantity += 1;
+        existing.quantity += quantity;
     } else {
-        cart.push({ ...product, fullName, quantity: 1 });
+        cart.push({ ...product, fullName, quantity });
     }
     updateCartUI();
+}
+
+function parseQuantity(value) {
+    const quantity = Number.parseInt(value, 10);
+    return Number.isFinite(quantity) ? Math.min(99, Math.max(1, quantity)) : 1;
+}
+
+function showCartConfirmation(message) {
+    const confirmation = document.getElementById("cart-confirmation");
+    confirmation.textContent = message;
+    confirmation.classList.add("visible");
+    window.clearTimeout(showCartConfirmation.timeoutId);
+    showCartConfirmation.timeoutId = window.setTimeout(() => {
+        confirmation.classList.remove("visible");
+    }, 2500);
 }
 
 function toggleCartModal() {
@@ -233,15 +276,42 @@ function updateCartUI() {
 
     let subtotal = 0;
 
-    cart.forEach(item => {
-        let itemSubtotal = item.price * item.quantity;
+    cart.forEach((item, index) => {
+        const itemSubtotal = item.price * item.quantity;
         subtotal += itemSubtotal;
         const row = document.createElement("div");
         row.className = "cart-item-row";
-        row.innerHTML = `
-            <span>${item.quantity}x ${item.fullName}</span>
-            <span>$${itemSubtotal} MXN</span>
-        `;
+        const name = document.createElement("span");
+        name.className = "cart-item-name";
+        name.textContent = item.fullName;
+
+        const quantityControls = document.createElement("div");
+        quantityControls.className = "cart-quantity-controls";
+        const decreaseButton = document.createElement("button");
+        decreaseButton.type = "button";
+        decreaseButton.className = "quantity-button";
+        decreaseButton.textContent = "−";
+        decreaseButton.setAttribute("aria-label", `Disminuir cantidad de ${item.fullName}`);
+        decreaseButton.addEventListener("click", () => changeCartQuantity(index, -1));
+
+        const quantity = document.createElement("span");
+        quantity.textContent = item.quantity;
+        quantity.setAttribute("aria-label", "Cantidad");
+
+        const increaseButton = document.createElement("button");
+        increaseButton.type = "button";
+        increaseButton.className = "quantity-button";
+        increaseButton.textContent = "+";
+        increaseButton.setAttribute("aria-label", `Aumentar cantidad de ${item.fullName}`);
+        increaseButton.addEventListener("click", () => changeCartQuantity(index, 1));
+
+        quantityControls.append(decreaseButton, quantity, increaseButton);
+
+        const price = document.createElement("span");
+        price.className = "cart-item-price";
+        price.textContent = `$${itemSubtotal} MXN`;
+
+        row.append(name, quantityControls, price);
         listContainer.appendChild(row);
     });
 
@@ -261,6 +331,15 @@ function updateCartUI() {
     }
 }
 
+function changeCartQuantity(index, change) {
+    const item = cart[index];
+    if (!item) return;
+
+    item.quantity += change;
+    if (item.quantity <= 0) cart.splice(index, 1);
+    updateCartUI();
+}
+
 function sendToWhatsApp() {
     if (cart.length === 0) {
         alert("Tu carrito está vacío.");
@@ -268,6 +347,7 @@ function sendToWhatsApp() {
     }
 
     const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
     let message = "Hola, ¡Quiero hacer el siguiente pedido en *Corner Latte House*!\n\n";
     let subtotal = 0;
 
@@ -284,6 +364,10 @@ function sendToWhatsApp() {
     } else {
         message += `🛵 *Método:* Envío a domicilio (Pendiente cotizar zona)\n`;
     }
+
+    message += paymentMethod === "transferencia"
+        ? `💳 *Método de pago:* Transferencia (Solicito los datos para realizarla).\n`
+        : `💵 *Método de pago:* Efectivo.\n`;
 
     message += `\n¡Quedo a la espera de la confirmación y total final!`;
 
