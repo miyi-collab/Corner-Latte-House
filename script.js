@@ -39,6 +39,8 @@ const products = [
     { id: 29, name: "Jarabe Extra", category: "extras", price: 12, description: "Sabor adicional." },
     { id: 30, name: "Miel Extra", category: "extras", price: 12, description: "Porción de miel." },
     { id: 31, name: "Leche Vegetal", category: "extras", price: 15, description: "Selecciona tu tipo de leche favorita.", options: ["Leche de Avena", "Leche de Almendra", "Leche de Soya", "Leche de Coco"] },
+    { id: 38, name: "Descafeinado", category: "extras", price: 8, description: " extra del café descafeinado." },
+    { id: 39, name: "Espresso Descafeinado extra", category: "extras", price: 38, description: "Shot de espresso sin cafeína." },
 
     // Bebidas de Temporada
     { id: 32, name: "Pumpkin Spice Latte", category: "temporada", price: 72, description: "Clásico latte de calabaza + shot de espresso.", options: ["Frío", "Caliente"] },
@@ -458,7 +460,7 @@ function sendToWhatsApp() {
 
     const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-    let message = "Hola, ¡Quiero hacer el siguiente pedido en *Corner Latte House*!\n\n";
+    let message = "Hola, ¡Quiero hacer el siguiente pedido, gracias:!\n\n";
     let subtotal = 0;
 
     cart.forEach(item => {
