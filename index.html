@@ -13,7 +13,8 @@
 <body id="body-theme">
 
     <!-- Contenedor para elementos gráficos flotantes de temporada -->
-    <div class="seasonal-decorations" id="seasonal-decorations"></div>
+    <div class="seasonal-decorations" id="seasonal-decorations" aria-hidden="true"></div>
+    <div class="seasonal-corners" id="seasonal-corners" aria-hidden="true"></div>
 
     <!-- Header / Banner de Temporada Dinámico -->
     <header class="hero-section">
@@ -30,11 +31,21 @@
     <section class="promo-section">
         <div class="promo-card">
             <i class="fa-solid fa-tag"></i>
-            <div>
-                <h3>Promoción de Hoy</h3>
-                <p id="daily-promo-text">Cargando promoción...</p>
+            <div class="promo-content">
+                <h3>Promociones</h3>
+                <p id="daily-promo-text">Cargando promociones...</p>
+                <div class="promotions-list" id="promotions-list"></div>
             </div>
         </div>
+    </section>
+
+    <section class="hours-section" id="hours-section" aria-labelledby="hours-title">
+        <h2 id="hours-title"><i class="fa-regular fa-clock"></i> Horarios de atención</h2>
+        <div class="hours-grid">
+            <p><strong>Lunes a sábado</strong><span>8:00 am – 2:00 pm<br>4:30 pm – 9:00 pm</span></p>
+            <p><strong>Domingo</strong><span>9:00 am – 2:00 pm<br>5:00 pm – 9:00 pm</span></p>
+        </div>
+        <p class="store-status" id="store-status" aria-live="polite"></p>
     </section>
 
     <!-- Contenedor Principal del Menú -->
@@ -43,13 +54,13 @@
         
         <!-- Pestañas de Categorías -->
         <div class="menu-tabs">
-            <button class="tab-btn active" onclick="filterMenu('todas', this)">Todas</button>
-            <button class="tab-btn" onclick="filterMenu('temporada', this)">Temporada</button>
-            <button class="tab-btn" onclick="filterMenu('frias', this)">Bebidas Frías</button>
-            <button class="tab-btn" onclick="filterMenu('calientes', this)">Calientes</button>
-            <button class="tab-btn" onclick="filterMenu('matcha', this)">Matcha</button>
-            <button class="tab-btn" onclick="filterMenu('especiales', this)">Especiales</button>
-            <button class="tab-btn" onclick="filterMenu('extras', this)">Extras</button>
+            <button class="tab-btn active" data-category="todas" onclick="filterMenu('todas', this)">Todas</button>
+            <button class="tab-btn" data-category="temporada" onclick="filterMenu('temporada', this)">Temporada</button>
+            <button class="tab-btn" data-category="frias" onclick="filterMenu('frias', this)">Bebidas Frías</button>
+            <button class="tab-btn" data-category="calientes" onclick="filterMenu('calientes', this)">Calientes</button>
+            <button class="tab-btn" data-category="matcha" onclick="filterMenu('matcha', this)">Matcha</button>
+            <button class="tab-btn" data-category="especiales" onclick="filterMenu('especiales', this)">Especiales</button>
+            <button class="tab-btn" data-category="extras" onclick="filterMenu('extras', this)">Extras</button>
         </div>
 
         <!-- Lista de Productos -->
@@ -72,6 +83,26 @@
             <button class="whatsapp-btn" style="background-color: var(--dark-brown);" onclick="confirmAddToCart()">
                 Confirmar y agregar
             </button>
+        </div>
+    </div>
+
+    <div class="cart-modal closed-modal" id="closed-modal" role="dialog" aria-modal="true" aria-labelledby="closed-title">
+        <div class="cart-content closed-content">
+            <button class="close-btn" type="button" aria-label="Cerrar aviso" onclick="closeStoreClosedModal()">&times;</button>
+            <div class="closed-illustration" aria-hidden="true">
+                <svg viewBox="0 0 180 150">
+                    <path d="M43 55h82v53a22 22 0 0 1-22 22H65a22 22 0 0 1-22-22V55Z" fill="#c98c5b"/>
+                    <path d="M125 68h10a18 18 0 0 1 0 36h-10" fill="none" stroke="#8a5639" stroke-width="10"/>
+                    <path d="M58 48c-8-12 7-15 0-27m27 27c-8-12 7-15 0-27m27 27c-8-12 7-15 0-27" fill="none" stroke="#d4af37" stroke-linecap="round" stroke-width="5"/>
+                    <path d="M34 135h112" stroke="#8a5639" stroke-linecap="round" stroke-width="8"/>
+                    <path d="m31 40 5 10 11 2-8 7 2 11-10-5-10 5 2-11-8-7 11-2 5-10Zm111 6 4 8 9 1-7 6 2 9-8-4-8 4 2-9-7-6 9-1 4-8Z" fill="#e7c66a"/>
+                </svg>
+            </div>
+            <p class="closed-eyebrow">Corner Latte House</p>
+            <h2 id="closed-title">¡Estamos cerrados por ahora!</h2>
+            <p id="closed-message" class="closed-message"></p>
+            <p class="closed-note">Puedes explorar nuestro menú; los pedidos estarán disponibles cuando abramos.</p>
+            <button class="hours-link" type="button" onclick="viewStoreHours()">Ver horarios de atención</button>
         </div>
     </div>
 
@@ -103,8 +134,9 @@
             <div class="payment-options">
                 <label class="payment-options-title">Método de pago:</label>
                 <div class="payment-options-list">
-                    <label><input type="radio" name="paymentMethod" value="efectivo" checked> Efectivo</label>
-                    <label><input type="radio" name="paymentMethod" value="transferencia"> Transferencia</label>
+                    <label class="payment-choice" data-delivery="domicilio"><input type="radio" name="paymentMethod" value="efectivo" checked> Efectivo</label>
+                    <label class="payment-choice" data-delivery="both"><input type="radio" name="paymentMethod" value="transferencia"> Transferencia</label>
+                    <label class="payment-choice" data-delivery="recoger"><input type="radio" name="paymentMethod" value="caja"> Pagar en caja</label>
                 </div>
             </div>
             <div class="cart-total" id="cart-total-container">

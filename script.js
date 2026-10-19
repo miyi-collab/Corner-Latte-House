@@ -51,11 +51,21 @@ const products = [
 
 let cart = [];
 let currentProductToConfigure = null;
+let currentMenuCategory = "todas";
+let storeIsOpen = false;
+let currentStoreDay = null;
+
+const promotions = [
+    { id: "moka-pair", name: "2 Mokas fríos", description: "Lleva 2 Mokas fríos por $100 MXN.", productId: 6, days: [1, 2, 3], price: 100 },
+    { id: "taro-pair", name: "2 Taros fríos", description: "Lleva 2 Taros fríos por $100 MXN.", productId: 7, days: [4, 5], price: 100 }
+];
 
 document.addEventListener("DOMContentLoaded", () => {
     checkSeasonAndTheme();
     setupDailyPromo();
+    updateStoreStatus();
     filterMenu('todas');
+    window.setInterval(updateStoreStatus, 60000);
 });
 
 // Sistema de Temporadas y Elementos Gráficos Flotantes Automáticos
@@ -121,29 +131,65 @@ function checkSeasonAndTheme() {
         el.style.fontSize = `${1.2 + Math.random() * 1.5}rem`;
         decorContainer.appendChild(el);
     }
+
+    const corners = document.getElementById("seasonal-corners");
+    corners.innerHTML = "";
+    ["top-left", "top-right", "bottom-left", "bottom-right"].forEach((position, index) => {
+        const ornament = document.createElement("i");
+        ornament.className = `fa-solid ${icons[index % icons.length]} corner-ornament ${position}`;
+        corners.appendChild(ornament);
+    });
 }
 
 // Configuración de Promociones por Día de la Semana
 function setupDailyPromo() {
-    const day = new Date().getDay();
+    const day = getStoreDateTime().day;
+    currentStoreDay = day;
     const promoText = document.getElementById("daily-promo-text");
+    const activePromotions = promotions.filter(promo => promo.days.includes(day));
+    promoText.textContent = activePromotions.length
+        ? "Elige una promoción disponible hoy. Las ofertas solo se pueden agregar en los días indicados."
+        : "Hoy no hay promociones activas, pero puedes disfrutar de todo nuestro menú.";
 
-    if (day >= 1 && day <= 3) {
-        promoText.innerHTML = "<strong>¡Días de Moka!</strong> Lunes a Miércoles lleva 2 Mokas x $100.";
-    } else if (day === 4 || day === 5) {
-        promoText.innerHTML = "<strong>¡Días de Taro!</strong> Jueves y Viernes disfruta de 2 Taros x $100.";
-    } else {
-        promoText.innerHTML = "<strong>¡Fin de semana en Corner!</strong> Ven a probar nuestras especialidades.";
-    }
+    const list = document.getElementById("promotions-list");
+    list.innerHTML = "";
+    promotions.forEach(promo => {
+        const availableToday = promo.days.includes(day);
+        const card = document.createElement("div");
+        card.className = `promotion-option${availableToday ? " promotion-available" : ""}`;
+
+        const details = document.createElement("div");
+        details.className = "promotion-details";
+        const title = document.createElement("strong");
+        title.textContent = promo.name;
+        const description = document.createElement("span");
+        description.textContent = promo.description;
+        const days = document.createElement("small");
+        days.textContent = promo.id === "moka-pair" ? "Lunes a miércoles" : "Jueves y viernes";
+        details.append(title, description, days);
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "promotion-button";
+        button.textContent = availableToday ? "Agregar promoción" : "No disponible hoy";
+        button.disabled = !availableToday || !storeIsOpen;
+        button.setAttribute("aria-label", `${button.textContent}: ${promo.name}`);
+        button.addEventListener("click", () => addPromotionToCart(promo));
+
+        card.append(details, button);
+        list.appendChild(card);
+    });
 }
 
 // Filtrar Menú
 function filterMenu(category, selectedTab) {
     const grid = document.getElementById("products-grid");
     grid.innerHTML = "";
+    currentMenuCategory = category;
 
     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-    if (selectedTab) selectedTab.classList.add("active");
+    const activeTab = selectedTab || document.querySelector(`.tab-btn[data-category="${category}"]`);
+    if (activeTab) activeTab.classList.add("active");
 
     const filtered = category === 'todas' ? products : products.filter(p => p.category === category);
 
@@ -157,7 +203,9 @@ function filterMenu(category, selectedTab) {
             </div>
             <div class="product-footer">
                 <span class="price">$${product.price} MXN</span>
-                <button class="add-btn" onclick="handleAddToCartClick(${product.id})">Agregar</button>
+                <button class="add-btn" onclick="handleAddToCartClick(${product.id})" ${storeIsOpen ? "" : "disabled"}>
+                    ${storeIsOpen ? "Agregar" : "Cerrado"}
+                </button>
             </div>
         `;
         grid.appendChild(card);
@@ -165,7 +213,12 @@ function filterMenu(category, selectedTab) {
 }
 
 function handleAddToCartClick(id) {
+    if (!storeIsOpen) {
+        openStoreClosedModal();
+        return;
+    }
     const product = products.find(p => p.id === id);
+    if (!product) return;
     currentProductToConfigure = product;
     showOptionsModal(product);
 }
@@ -203,6 +256,13 @@ function showOptionsModal(product) {
     quantityLabel.className = "quantity-label";
     quantityLabel.textContent = "Cantidad:";
 
+    const quantityControls = document.createElement("div");
+    quantityControls.className = "quantity-picker";
+    const decreaseButton = document.createElement("button");
+    decreaseButton.type = "button";
+    decreaseButton.className = "quantity-button";
+    decreaseButton.textContent = "−";
+    decreaseButton.setAttribute("aria-label", "Disminuir cantidad");
     const quantityInput = document.createElement("input");
     quantityInput.id = "selected-product-quantity";
     quantityInput.className = "quantity-input";
@@ -211,7 +271,20 @@ function showOptionsModal(product) {
     quantityInput.max = "99";
     quantityInput.value = "1";
     quantityInput.inputMode = "numeric";
-    container.append(quantityLabel, quantityInput);
+    quantityInput.setAttribute("aria-label", "Cantidad");
+    const increaseButton = document.createElement("button");
+    increaseButton.type = "button";
+    increaseButton.className = "quantity-button";
+    increaseButton.textContent = "+";
+    increaseButton.setAttribute("aria-label", "Aumentar cantidad");
+    decreaseButton.addEventListener("click", () => {
+        quantityInput.value = String(parseQuantity(quantityInput.value) - 1);
+    });
+    increaseButton.addEventListener("click", () => {
+        quantityInput.value = String(Math.min(99, parseQuantity(quantityInput.value) + 1));
+    });
+    quantityControls.append(decreaseButton, quantityInput, increaseButton);
+    container.append(quantityLabel, quantityControls);
 
     modal.style.display = "flex";
 }
@@ -223,6 +296,11 @@ function closeOptionsModal() {
 
 function confirmAddToCart() {
     if (!currentProductToConfigure) return;
+    if (!storeIsOpen) {
+        closeOptionsModal();
+        openStoreClosedModal();
+        return;
+    }
     const optionSelect = document.getElementById("selected-product-option");
     const variant = optionSelect ? optionSelect.value : "Estándar";
     const quantity = parseQuantity(document.getElementById("selected-product-quantity").value);
@@ -232,6 +310,10 @@ function confirmAddToCart() {
 }
 
 function addToCart(product, variant, quantity = 1) {
+    if (!storeIsOpen) {
+        openStoreClosedModal();
+        return;
+    }
     const fullName = variant !== "Estándar" ? `${product.name} (${variant})` : product.name;
     const existing = cart.find(item => item.fullName === fullName);
 
@@ -264,6 +346,18 @@ function toggleCartModal() {
 
     modal.style.display = isOpening ? "flex" : "none";
     if (isOpening) updateCartUI();
+}
+
+function addPromotionToCart(promo) {
+    if (!promo.days.includes(getStoreDateTime().day)) return;
+    if (!storeIsOpen) {
+        openStoreClosedModal();
+        return;
+    }
+    const product = products.find(item => item.id === promo.productId);
+    if (!product) return;
+    addToCart({ ...product, id: promo.id, name: promo.name, price: promo.price, description: promo.description }, "Estándar");
+    showCartConfirmation(`${promo.name} agregada al carrito.`);
 }
 
 function updateCartUI() {
@@ -316,6 +410,18 @@ function updateCartUI() {
     });
 
     const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+    const paymentChoices = document.querySelectorAll(".payment-choice");
+    paymentChoices.forEach(choice => {
+        const method = choice.querySelector('input[name="paymentMethod"]');
+        const visible = choice.dataset.delivery === "both" || choice.dataset.delivery === deliveryType;
+        choice.hidden = !visible;
+        method.disabled = !visible;
+    });
+    const selectedPayment = document.querySelector('input[name="paymentMethod"]:checked');
+    if (selectedPayment.disabled) {
+        const defaultMethod = deliveryType === "recoger" ? "caja" : "efectivo";
+        document.querySelector(`input[name="paymentMethod"][value="${defaultMethod}"]`).checked = true;
+    }
     const addressBox = document.getElementById("store-address");
     const totalContainer = document.getElementById("cart-total-container");
 
@@ -341,6 +447,10 @@ function changeCartQuantity(index, change) {
 }
 
 function sendToWhatsApp() {
+    if (!storeIsOpen) {
+        openStoreClosedModal();
+        return;
+    }
     if (cart.length === 0) {
         alert("Tu carrito está vacío.");
         return;
@@ -365,9 +475,13 @@ function sendToWhatsApp() {
         message += `🛵 *Método:* Envío a domicilio (Pendiente cotizar zona)\n`;
     }
 
-    message += paymentMethod === "transferencia"
-        ? `💳 *Método de pago:* Transferencia (Solicito los datos para realizarla).\n`
-        : `💵 *Método de pago:* Efectivo.\n`;
+    if (paymentMethod === "transferencia") {
+        message += `💳 *Método de pago:* Transferencia (Solicito los datos para realizarla).\n`;
+    } else if (paymentMethod === "caja") {
+        message += `💵 *Método de pago:* Pagaré en caja al recoger.\n`;
+    } else {
+        message += `💵 *Método de pago:* Efectivo.\n`;
+    }
 
     message += `\n¡Quedo a la espera de la confirmación y total final!`;
 
@@ -375,4 +489,94 @@ function sendToWhatsApp() {
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     window.open(url, '_blank');
+}
+
+function getStoreDateTime() {
+    const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Mexico_City",
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23"
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    const weekdays = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+    return {
+        day: weekdays[values.weekday],
+        minutes: Number(values.hour) * 60 + Number(values.minute)
+    };
+}
+
+function getOpeningIntervals(day) {
+    return day === 0 ? [[9 * 60, 14 * 60], [17 * 60, 21 * 60]] : [[8 * 60, 14 * 60], [16 * 60 + 30, 21 * 60]];
+}
+
+function formatOpeningTime(minutes) {
+    const hour = Math.floor(minutes / 60);
+    const minute = minutes % 60;
+    const period = hour >= 12 ? "pm" : "am";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${String(minute).padStart(2, "0")} ${period}`;
+}
+
+function getNextOpening(day, minutes) {
+    for (let offset = 0; offset <= 7; offset++) {
+        const candidateDay = (day + offset) % 7;
+        const opening = getOpeningIntervals(candidateDay).find(([start]) => offset > 0 || start > minutes);
+        if (opening) return { day: candidateDay, offset, minutes: opening[0] };
+    }
+    return null;
+}
+
+function updateStoreStatus() {
+    const { day, minutes } = getStoreDateTime();
+    const isOpen = getOpeningIntervals(day).some(([start, end]) => minutes >= start && minutes < end);
+    const wasOpen = storeIsOpen;
+    storeIsOpen = isOpen;
+
+    const status = document.getElementById("store-status");
+    status.textContent = isOpen ? "Ahora estamos abiertos y aceptando pedidos." : "Ahora estamos cerrados.";
+    status.classList.toggle("is-open", isOpen);
+    status.classList.toggle("is-closed", !isOpen);
+
+    if (wasOpen !== isOpen) filterMenu(currentMenuCategory);
+    if (currentStoreDay !== day || wasOpen !== isOpen) setupDailyPromo();
+
+    const closedModal = document.getElementById("closed-modal");
+    if (isOpen) {
+        closedModal.style.display = "none";
+    } else {
+        updateClosedMessage(day, minutes);
+        if (wasOpen || closedModal.dataset.dismissed !== "true") openStoreClosedModal();
+    }
+}
+
+function updateClosedMessage(day, minutes) {
+    const nextOpening = getNextOpening(day, minutes);
+    if (!nextOpening) return;
+    const dayNames = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+    const dayLabel = nextOpening.offset === 0
+        ? "hoy"
+        : nextOpening.offset === 1
+            ? "mañana"
+            : `el ${dayNames[nextOpening.day]}`;
+    const message = document.getElementById("closed-message");
+    message.textContent = `Regresamos ${dayLabel} a las ${formatOpeningTime(nextOpening.minutes)}.`;
+}
+
+function openStoreClosedModal() {
+    const modal = document.getElementById("closed-modal");
+    modal.dataset.dismissed = "false";
+    modal.style.display = "flex";
+}
+
+function closeStoreClosedModal() {
+    const modal = document.getElementById("closed-modal");
+    modal.dataset.dismissed = "true";
+    modal.style.display = "none";
+}
+
+function viewStoreHours() {
+    closeStoreClosedModal();
+    document.getElementById("hours-section").scrollIntoView({ behavior: "smooth", block: "center" });
 }
