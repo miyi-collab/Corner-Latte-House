@@ -82,6 +82,7 @@
     </div>
 
     <!-- Modal del Carrito -->
+    <!-- Modal del Carrito -->
     <div class="cart-modal" id="cart-modal">
         <div class="cart-content">
             <span class="close-btn" onclick="toggleCartModal()">&times;</span>
@@ -89,15 +90,29 @@
             <div id="cart-items-list" class="cart-items-list">
                 <!-- Items seleccionados -->
             </div>
-            <div class="cart-total">
-                <strong>Total: $<span id="cart-total-price">0</span> MXN</strong>
+
+            <!-- Opciones de Envío / Recoger -->
+            <div class="delivery-options" style="margin: 1rem 0; font-size: 0.9rem;">
+                <label style="font-weight: 500; color: var(--dark-brown); display: block; margin-bottom: 0.5rem;">Método de entrega:</label>
+                <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
+                    <label style="cursor: pointer;"><input type="radio" name="deliveryType" value="domicilio" checked onchange="updateCartUI()"> Envío a domicilio</label>
+                    <label style="cursor: pointer;"><input type="radio" name="deliveryType" value="recoger" onchange="updateCartUI()"> Recoger en cafetería</label>
+                </div>
+                <div id="store-address" style="font-size: 0.8rem; color: #666; background: var(--primary-beige); padding: 0.5rem; border-radius: 6px; display: none;">
+                    📍 <strong>Ubicación:</strong> Corner Latte House (Consulta nuestra dirección exacta por WhatsApp).
+                </div>
             </div>
+
+            <div class="cart-total" id="cart-total-container">
+                <!-- Se actualiza dinámicamente -->
+            </div>
+
             <button class="whatsapp-btn" onclick="sendToWhatsApp()">
                 <i class="fa-brands fa-whatsapp"></i> Enviar pedido por WhatsApp
             </button>
         </div>
     </div>
-
+    
     <!-- Footer -->
     <footer>
         <p>&copy; 2026 Corner Latte House. Todos los derechos reservados.</p>

@@ -223,25 +223,34 @@ function updateCartUI() {
     const listContainer = document.getElementById("cart-items-list");
     listContainer.innerHTML = "";
 
-    let totalPrice = 0;
+    let subtotal = 0;
 
     cart.forEach(item => {
-        totalPrice += item.price * item.quantity;
+        let itemSubtotal = item.price * item.quantity;
+        subtotal += itemSubtotal;
         const row = document.createElement("div");
         row.className = "cart-item-row";
         row.innerHTML = `
             <span>${item.quantity}x ${item.fullName}</span>
-            <span>$${item.price * item.quantity} MXN</span>
+            <span>$${itemSubtotal} MXN</span>
         `;
         listContainer.appendChild(row);
     });
 
-    document.getElementById("cart-total-price").textContent = totalPrice;
-}
+    const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+    const addressBox = document.getElementById("store-address");
+    const totalContainer = document.getElementById("cart-total-container");
 
-function toggleCartModal() {
-    const modal = document.getElementById("cart-modal");
-    modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+    if (deliveryType === "recoger") {
+        addressBox.style.display = "block";
+        totalContainer.innerHTML = `<strong>Total a pagar: $${subtotal} MXN</strong>`;
+    } else {
+        addressBox.style.display = "none";
+        totalContainer.innerHTML = `
+            <strong>Subtotal: $${subtotal} MXN</strong>
+            <p style="font-size: 0.75rem; color: #d97706; margin-top: 0.2rem;">* El costo de envío varía según la zona y se cotizará por WhatsApp.</p>
+        `;
+    }
 }
 
 function sendToWhatsApp() {
@@ -250,19 +259,28 @@ function sendToWhatsApp() {
         return;
     }
 
-    let message = "Hola, ¡Quiero hacer el siguiente pedido en *Corner Latte House*!%0A%0A";
-    let total = 0;
+    const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+    let message = "Hola, ¡Quiero hacer el siguiente pedido en *Corner Latte House*!\n\n";
+    let subtotal = 0;
 
     cart.forEach(item => {
-        let subtotal = item.price * item.quantity;
-        total += subtotal;
-        message += `- ${item.quantity}x ${item.fullName} ($${subtotal} MXN)%0A`;
+        let itemSubtotal = item.price * item.quantity;
+        subtotal += itemSubtotal;
+        message += `- ${item.quantity}x ${item.fullName} ($${itemSubtotal} MXN)\n`;
     });
 
-    message += `%0A*Total a pagar: $${total} MXN*%0A¡Quedo a la espera de la confirmación!`;
+    message += `\n*Subtotal de productos: $${subtotal} MXN*\n`;
 
-    const phoneNumber = "312 149 1467"; // Reemplaza con tu número real
-    const url = `https://wa.me/${phoneNumber}?text=${message}`;
+    if (deliveryType === "recoger") {
+        message += `📍 *Método:* Recoger en cafetería\n*Total estimado: $${subtotal} MXN*\n`;
+    } else {
+        message += `🛵 *Método:* Envío a domicilio (Pendiente cotizar zona)\n`;
+    }
+
+    message += `\n¡Quedo a la espera de la confirmación y total final!`;
+
+    const phoneNumber = "5213121491467"; // Recuerda poner tu número real aquí
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     window.open(url, '_blank');
 }
