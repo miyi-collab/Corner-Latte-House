@@ -138,12 +138,12 @@ function setupDailyPromo() {
 }
 
 // Filtrar Menú
-function filterMenu(category) {
+function filterMenu(category, selectedTab) {
     const grid = document.getElementById("products-grid");
     grid.innerHTML = "";
 
     document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-    event && event.target.classList.add("active");
+    if (selectedTab) selectedTab.classList.add("active");
 
     const filtered = category === 'todas' ? products : products.filter(p => p.category === category);
 
