@@ -292,10 +292,12 @@ body.theme-pascua .seasonal-banner { background-color: #8e24aa; color: #ff80ab; 
     left: 0;
     width: 100%;
     height: 100%;
+    padding: 1rem;
     background-color: rgba(0,0,0,0.5);
     z-index: 100;
     justify-content: center;
     align-items: center;
+    overflow-y: auto;
 }
 
 .cart-content {
@@ -304,6 +306,8 @@ body.theme-pascua .seasonal-banner { background-color: #8e24aa; color: #ff80ab; 
     border-radius: 12px;
     width: 90%;
     max-width: 450px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
     position: relative;
 }
 
