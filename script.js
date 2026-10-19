@@ -215,6 +215,14 @@ function addToCart(product, variant) {
     updateCartUI();
 }
 
+function toggleCartModal() {
+    const modal = document.getElementById("cart-modal");
+    const isOpening = modal.style.display !== "flex";
+
+    modal.style.display = isOpening ? "flex" : "none";
+    if (isOpening) updateCartUI();
+}
+
 function updateCartUI() {
     const countSpan = document.getElementById("cart-count");
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
