@@ -546,6 +546,56 @@ body.theme-pascua .seasonal-banner { background-color: #8e24aa; color: #ff80ab; 
     cursor: pointer;
 }
 
+.customer-address-field,
+.schedule-order {
+    margin-top: 0.9rem;
+}
+
+.customer-address-field label,
+.schedule-field label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--dark-brown);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.customer-address-field textarea,
+.schedule-field input {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--secondary-brown);
+    border-radius: 8px;
+    background: #fffdfb;
+    color: var(--text-color);
+    font: inherit;
+    font-size: 0.9rem;
+}
+
+.customer-address-field textarea {
+    resize: vertical;
+}
+
+.schedule-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--dark-brown);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.schedule-field {
+    margin-top: 0.75rem;
+}
+
+.schedule-field small {
+    display: block;
+    margin-top: 0.3rem;
+    color: #766b63;
+    font-size: 0.75rem;
+}
+
 .quantity-label {
     display: block;
     margin-top: 1rem;

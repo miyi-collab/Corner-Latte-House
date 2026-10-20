@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkSeasonAndTheme();
     setupDailyPromo();
     updateStoreStatus();
+    toggleScheduleOrder();
     filterMenu('todas');
     window.setInterval(updateStoreStatus, 60000);
 });
@@ -350,6 +351,17 @@ function toggleCartModal() {
     if (isOpening) updateCartUI();
 }
 
+function toggleScheduleOrder() {
+    const scheduleCheckbox = document.getElementById("schedule-order");
+    const scheduleField = document.getElementById("schedule-field");
+    const scheduledAt = document.getElementById("scheduled-at");
+    scheduleField.hidden = !scheduleCheckbox.checked;
+    scheduledAt.required = scheduleCheckbox.checked;
+
+    const now = new Date();
+    scheduledAt.min = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+
 function addPromotionToCart(promo) {
     if (!promo.days.includes(getStoreDateTime().day)) return;
     if (!storeIsOpen) {
@@ -412,6 +424,11 @@ function updateCartUI() {
     });
 
     const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+    const customerAddressField = document.getElementById("customer-address-field");
+    const customerAddress = document.getElementById("customer-address");
+    customerAddressField.hidden = deliveryType !== "domicilio";
+    customerAddress.required = deliveryType === "domicilio";
+
     const paymentChoices = document.querySelectorAll(".payment-choice");
     paymentChoices.forEach(choice => {
         const method = choice.querySelector('input[name="paymentMethod"]');
@@ -449,7 +466,8 @@ function changeCartQuantity(index, change) {
 }
 
 function sendToWhatsApp() {
-    if (!storeIsOpen) {
+    const isScheduled = document.getElementById("schedule-order").checked;
+    if (!storeIsOpen && !isScheduled) {
         openStoreClosedModal();
         return;
     }
@@ -460,6 +478,33 @@ function sendToWhatsApp() {
 
     const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const customerAddress = document.getElementById("customer-address").value.trim();
+    if (deliveryType === "domicilio" && !customerAddress) {
+        alert("Escribe la dirección donde se entregará tu pedido.");
+        document.getElementById("customer-address").focus();
+        return;
+    }
+
+    let scheduledAt = null;
+    if (isScheduled) {
+        const scheduledInput = document.getElementById("scheduled-at");
+        scheduledAt = new Date(scheduledInput.value);
+        if (!scheduledInput.value || Number.isNaN(scheduledAt.getTime()) || scheduledAt <= new Date()) {
+            alert("Selecciona una fecha y hora futura para programar tu pedido.");
+            scheduledInput.focus();
+            return;
+        }
+
+        const scheduledStoreTime = getStoreDateTime(scheduledAt);
+        const isWithinOpeningHours = getOpeningIntervals(scheduledStoreTime.day)
+            .some(([start, end]) => scheduledStoreTime.minutes >= start && scheduledStoreTime.minutes < end);
+        if (!isWithinOpeningHours) {
+            alert("La fecha y hora elegidas deben estar dentro del horario de atención.");
+            scheduledInput.focus();
+            return;
+        }
+    }
+
     let message = "Hola, ¡Quiero hacer el siguiente pedido, gracias:!\n\n";
     let subtotal = 0;
 
@@ -471,10 +516,23 @@ function sendToWhatsApp() {
 
     message += `\n*Subtotal de productos: $${subtotal} MXN*\n`;
 
+    if (scheduledAt) {
+        const formattedSchedule = new Intl.DateTimeFormat("es-MX", {
+            timeZone: "America/Mexico_City",
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit"
+        }).format(scheduledAt);
+        message += `🕒 *Pedido programado para:* ${formattedSchedule}\n`;
+    }
+
     if (deliveryType === "recoger") {
         message += `📍 *Método:* Recoger en cafetería\n*Total estimado: $${subtotal} MXN*\n`;
     } else {
-        message += `🛵 *Método:* Envío a domicilio (Pendiente cotizar zona)\n`;
+        message += `🛵 *Método:* Envío a domicilio\n*Dirección de entrega:* ${customerAddress}\n(Pendiente cotizar costo de envío según la zona)\n`;
     }
 
     if (paymentMethod === "transferencia") {
@@ -493,14 +551,14 @@ function sendToWhatsApp() {
     window.open(url, '_blank');
 }
 
-function getStoreDateTime() {
+function getStoreDateTime(date = new Date()) {
     const parts = new Intl.DateTimeFormat("en-US", {
         timeZone: "America/Mexico_City",
         weekday: "short",
         hour: "2-digit",
         minute: "2-digit",
         hourCycle: "h23"
-    }).formatToParts(new Date());
+    }).formatToParts(date);
     const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
     const weekdays = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
     return {
@@ -510,7 +568,9 @@ function getStoreDateTime() {
 }
 
 function getOpeningIntervals(day) {
-    return day === 0 ? [[9 * 60, 14 * 60], [17 * 60, 21 * 60]] : [[8 * 60, 14 * 60], [16 * 60 + 30, 21 * 60]];
+    if (day === 0) return [[10 * 60, 14 * 60], [17 * 60, 21 * 60]];
+    if (day === 6) return [[9 * 60, 14 * 60], [16 * 60 + 30, 21 * 60]];
+    return [[8 * 60, 14 * 60], [16 * 60 + 30, 21 * 60]];
 }
 
 function formatOpeningTime(minutes) {

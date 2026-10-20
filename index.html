@@ -42,8 +42,9 @@
     <section class="hours-section" id="hours-section" aria-labelledby="hours-title">
         <h2 id="hours-title"><i class="fa-regular fa-clock"></i> Horarios de atención</h2>
         <div class="hours-grid">
-            <p><strong>Lunes a sábado</strong><span>8:00 am – 2:00 pm<br>4:30 pm – 9:00 pm</span></p>
-            <p><strong>Domingo</strong><span>9:00 am – 2:00 pm<br>5:00 pm – 9:00 pm</span></p>
+            <p><strong>Lunes a viernes</strong><span>8:00 am – 2:00 pm<br>4:30 pm – 9:00 pm</span></p>
+            <p><strong>Sábado</strong><span>9:00 am – 2:00 pm<br>4:30 pm – 9:00 pm</span></p>
+            <p><strong>Domingo</strong><span>10:00 am – 2:00 pm<br>5:00 pm – 9:00 pm</span></p>
         </div>
         <p class="store-status" id="store-status" aria-live="polite"></p>
     </section>
@@ -132,6 +133,21 @@
                     <a href="https://www.google.com/maps/search/?api=1&amp;query=Justo+Sierra+52%2C+Guadalajarita%2C+28030+Colima%2C+Col." target="_blank" rel="noopener noreferrer">
                         Justo Sierra 52, Guadalajarita, 28030 Colima, Col.
                     </a>
+                </div>
+                <div class="customer-address-field" id="customer-address-field">
+                    <label for="customer-address">Dirección de entrega:</label>
+                    <textarea id="customer-address" rows="2" placeholder="Calle, número, colonia y referencias" autocomplete="street-address"></textarea>
+                </div>
+            </div>
+            <div class="schedule-order">
+                <label class="schedule-toggle">
+                    <input type="checkbox" id="schedule-order" onchange="toggleScheduleOrder()">
+                    Programar pedido para más tarde
+                </label>
+                <div class="schedule-field" id="schedule-field" hidden>
+                    <label for="scheduled-at">Fecha y hora de entrega o recolección:</label>
+                    <input id="scheduled-at" type="datetime-local">
+                    <small>Elige un horario dentro de la atención de la cafetería.</small>
                 </div>
             </div>
             <div class="payment-options">
