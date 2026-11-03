@@ -73,48 +73,56 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Sistema de Temporadas y Elementos Gráficos Flotantes Automáticos
 function checkSeasonAndTheme() {
-    const month = new Date().getMonth() + 1; // 1 - 12
+    const now = new Date();
+    const month = now.getMonth() + 1; // 1 - 12
     const bannerText = document.getElementById("seasonal-text");
     const body = document.getElementById("body-theme");
-    const decorContainer = document.getElementById("seasonal-decorations");
+    const themes = ["theme-halloween", "theme-muertos", "theme-revolucion", "theme-navidad", "theme-independencia", "theme-primavera", "theme-amor"];
     
-    decorContainer.innerHTML = ""; // Limpiar decoraciones previas
+    body.classList.remove(...themes);
 
+    const day = now.getDate();
     let icons = [];
 
-    // Octubre: Halloween
-    if (month === 10) {
+    // Mostrar cada tema únicamente durante la semana previa y el día de la festividad.
+    if (month === 10 && day >= 25) {
         body.classList.add("theme-halloween");
         bannerText.innerHTML = "🎃 ¡Temporada de Halloween y Pumpkin Spice en Corner Latte House!";
         icons = ['fa-spider', 'fa-ghost', 'fa-hat-wizard', 'fa-pumpkin'];
     } 
-    // Noviembre: Día de Muertos / Día de Gracias
+    // Día de Muertos: 1 al 3 de noviembre.
     else if (month === 11) {
-        body.classList.add("theme-halloween");
-        bannerText.innerHTML = "🕯️ Celebrando Día de Muertos y Día de Gracias. ¡Prueba nuestros especiales!";
-        icons = ['fa-feather', 'fa-fire', 'fa-leaf'];
+        if (day <= 3) {
+            body.classList.add("theme-muertos");
+            bannerText.innerHTML = "🕯️ Celebrando Día de Muertos. ¡Prueba nuestros especiales!";
+            icons = ['fa-skull', 'fa-fire', 'fa-leaf', 'fa-spa'];
+        } else if (day >= 14 && day <= 20) {
+            body.classList.add("theme-revolucion");
+            bannerText.innerHTML = "🇲🇽 Conmemoramos la Revolución Mexicana en Corner Latte House.";
+            icons = ['fa-flag', 'fa-star', 'fa-horse'];
+        }
     } 
-    // Diciembre: Navidad
-    else if (month === 12) {
+    // Semana previa y día de Navidad.
+    else if (month === 12 && day >= 19 && day <= 25) {
         body.classList.add("theme-navidad");
         bannerText.innerHTML = "🎄 ¡Felices Fiestas! Ven a abrigarte con nuestras bebidas navideñas.";
         icons = ['fa-snowflake', 'fa-gifts', 'fa-holly-berry', 'fa-tree'];
     } 
-    // Septiembre: Independencia de México
-    else if (month === 9) {
+    // Semana previa y Día de la Independencia (16 de septiembre).
+    else if (month === 9 && day >= 10 && day <= 16) {
         body.classList.add("theme-independencia");
         bannerText.innerHTML = "🇲🇽 ¡Viva México! Disfruta tu café patrio en Corner Latte House.";
         icons = ['fa-bell', 'fa-flag', 'fa-star'];
     } 
-    // Marzo / Abril: Primavera / Pascua
-    else if (month === 3 || month === 4) {
+    // Semana del inicio de primavera.
+    else if (month === 3 && day >= 17 && day <= 23) {
         body.classList.add("theme-primavera");
-        bannerText.innerHTML = "🌷 ¡Disfruta la Primavera y la temporada de Pascua con nosotros!";
-        icons = ['fa-seedling', 'fa-feather', 'fa-sun', 'fa-flower'];
+        bannerText.innerHTML = "🌷 ¡Celebra el inicio de la Primavera con nosotros!";
+        icons = ['fa-seedling', 'fa-feather', 'fa-sun', 'fa-leaf'];
     } 
-    // Febrero: Día del Amor y la Amistad (Extra incluido)
-    else if (month === 2) {
-        body.classList.add("theme-pascua");
+    // Semana previa y Día del Amor y la Amistad.
+    else if (month === 2 && day >= 8 && day <= 14) {
+        body.classList.add("theme-amor");
         bannerText.innerHTML = "💖 ¡Mes del Amor y la Amistad! Comparte un latte especial.";
         icons = ['fa-heart', 'fa-mug-hot'];
     } 
@@ -123,16 +131,9 @@ function checkSeasonAndTheme() {
         icons = ['fa-mug-hot', 'fa-coffee'];
     }
 
-    // Generar elementos gráficos flotantes aleatorios en el fondo
-    for (let i = 0; i < 12; i++) {
-        const iconClass = icons[Math.floor(Math.random() * icons.length)];
-        const el = document.createElement("i");
-        el.className = `fa-solid ${iconClass} floating-icon`;
-        el.style.top = `${Math.random() * 90}%`;
-        el.style.left = `${Math.random() * 95}%`;
-        el.style.animationDuration = `${4 + Math.random() * 4}s`;
-        el.style.fontSize = `${1.2 + Math.random() * 1.5}rem`;
-        decorContainer.appendChild(el);
+    if (!icons.length) {
+        bannerText.innerHTML = "✨ ¡Bienvenidos a Corner Latte House! Explora nuestro menú y bebidas del mes.";
+        icons = ['fa-mug-hot', 'fa-coffee'];
     }
 
     const corners = document.getElementById("seasonal-corners");
