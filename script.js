@@ -166,11 +166,14 @@ function setupDailyPromo() {
         details.className = "promotion-details";
         const title = document.createElement("strong");
         title.textContent = promo.name;
+        const price = document.createElement("span");
+        price.className = "promotion-price";
+        price.textContent = `$${promo.price} MXN`;
         const description = document.createElement("span");
         description.textContent = promo.description;
         const days = document.createElement("small");
         days.textContent = promo.id === "moka-pair" ? "Lunes a miércoles" : "Jueves y viernes";
-        details.append(title, description, days);
+        details.append(title, price, description, days);
 
         const button = document.createElement("button");
         button.type = "button";
@@ -196,11 +199,23 @@ function filterMenu(category, selectedTab) {
     if (activeTab) activeTab.classList.add("active");
 
     const filtered = category === 'todas' ? products : products.filter(p => p.category === category);
+    const categoryIcons = {
+        frias: "fa-glass-water",
+        calientes: "fa-mug-hot",
+        matcha: "fa-leaf",
+        especiales: "fa-star",
+        extras: "fa-cookie-bite",
+        temporada: "fa-snowflake"
+    };
 
     filtered.forEach(product => {
         const card = document.createElement("div");
         card.className = "product-card";
         card.innerHTML = `
+            <div class="product-image-placeholder category-${product.category}" data-image-path="assets/images/products/product-${product.id}.jpg" role="img" aria-label="Espacio para la fotografía de ${product.name}">
+                <span class="image-placeholder-icon"><i class="fa-solid ${categoryIcons[product.category] || "fa-mug-hot"}" aria-hidden="true"></i></span>
+                <span class="image-placeholder-label">Fotografía próximamente</span>
+            </div>
             <div class="product-info">
                 <h4>${product.name}</h4>
                 <p>${product.description}</p>
@@ -379,6 +394,7 @@ function updateCartUI() {
     const countSpan = document.getElementById("cart-count");
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     countSpan.textContent = totalItems;
+    document.getElementById("nav-cart-count").textContent = totalItems;
 
     const listContainer = document.getElementById("cart-items-list");
     listContainer.innerHTML = "";

@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corner Latte House</title>
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=8">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <!-- FontAwesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -14,72 +14,122 @@
 
     <div class="seasonal-corners" id="seasonal-corners" aria-hidden="true"></div>
 
-    <!-- Header / Banner de Temporada Dinámico -->
-    <header class="hero-section">
-        <div class="seasonal-banner" id="seasonal-banner">
-            <span id="seasonal-text">¡Bienvenidos a Corner Latte House!</span>
-        </div>
-        <div class="hero-content">
-            <h1 id="hero-title">Corner Latte House</h1>
-            <p>El punto de encuentro perfecto para tu café diario</p>
-        </div>
+    <div class="seasonal-banner" id="seasonal-banner" role="status">
+        <span id="seasonal-text">¡Bienvenidos a Corner Latte House!</span>
+    </div>
+
+    <header class="site-header">
+        <nav class="navigation" aria-label="Navegación principal">
+            <a class="brand-mark" href="#inicio" aria-label="Corner Latte House, inicio">
+                <span class="brand-icon"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i></span>
+                <span>Corner <em>Latte</em> House</span>
+            </a>
+            <div class="nav-links">
+                <a href="#inicio">Inicio</a>
+                <a href="#promociones">Promociones</a>
+                <a href="#hours-section">Horarios</a>
+                <a href="#menu">Menú</a>
+            </div>
+            <button class="nav-cart" type="button" onclick="toggleCartModal()" aria-label="Abrir carrito">
+                <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+                <span>Pedido</span>
+                <span class="nav-cart-count" id="nav-cart-count">0</span>
+            </button>
+        </nav>
     </header>
 
-    <!-- Promoción del Día -->
-    <section class="promo-section">
-        <div class="promo-card">
-            <i class="fa-solid fa-tag"></i>
-            <div class="promo-content">
-                <h3>Promociones</h3>
-                <p id="daily-promo-text">Cargando promociones...</p>
-                <div class="promotions-list" id="promotions-list"></div>
+    <main>
+        <section class="hero-section" id="inicio">
+            <div class="hero-content">
+                <div class="hero-copy">
+                    <span class="eyebrow"><span class="eyebrow-line"></span> Café, calma y buenos momentos</span>
+                    <h1 id="hero-title">Corner Latte<br><em>House</em></h1>
+                    <p>El punto de encuentro perfecto para tu café diario</p>
+                    <a class="hero-cta" href="#menu">Explorar el menú <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                    <div class="hero-note"><i class="fa-solid fa-seedling" aria-hidden="true"></i> Hecho para disfrutar sin prisa</div>
+                </div>
+                <div class="hero-visual" role="img" aria-label="Ilustración decorativa de una taza de café">
+                    <div class="hero-visual-sun"></div>
+                    <div class="hero-visual-caption"><span>Un buen día</span><strong>comienza aquí</strong></div>
+                    <div class="hero-cup" aria-hidden="true">
+                        <span class="hero-cup-steam steam-one"></span>
+                        <span class="hero-cup-steam steam-two"></span>
+                        <span class="hero-cup-steam steam-three"></span>
+                        <span class="hero-cup-body"><i class="fa-solid fa-mug-hot"></i></span>
+                        <span class="hero-cup-saucer"></span>
+                    </div>
+                    <span class="hero-visual-stamp"><i class="fa-solid fa-star" aria-hidden="true"></i> Corner Latte House</span>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="hours-section" id="hours-section" aria-labelledby="hours-title">
-        <h2 id="hours-title"><i class="fa-regular fa-clock"></i> Horarios de atención</h2>
-        <div class="hours-grid">
-            <p><strong>Lunes a viernes</strong><span>8:00 am – 2:00 pm<br>4:30 pm – 9:00 pm</span></p>
-            <p><strong>Sábado</strong><span>9:00 am – 2:00 pm<br>4:30 pm – 9:00 pm</span></p>
-            <p><strong>Domingo</strong><span>10:00 am – 2:00 pm<br>5:00 pm – 9:00 pm</span></p>
-        </div>
-        <p class="store-status" id="store-status" aria-live="polite"></p>
-    </section>
+        <section class="promo-section content-section" id="promociones" aria-labelledby="promotions-title">
+            <div class="section-heading">
+                <span class="eyebrow">Un pequeño antojo</span>
+                <h2 id="promotions-title">Promociones <em>de la casa</em></h2>
+                <p id="daily-promo-text">Cargando promociones...</p>
+            </div>
+            <div class="promotions-list" id="promotions-list"></div>
+        </section>
 
-    <!-- Contenedor Principal del Menú -->
-    <main class="menu-container">
-        <h2>Nuestro Menú</h2>
-        
-        <!-- Pestañas de Categorías -->
-        <div class="menu-tabs">
-            <button class="tab-btn active" data-category="todas" onclick="filterMenu('todas', this)">Todas</button>
-            <button class="tab-btn" data-category="temporada" onclick="filterMenu('temporada', this)">Temporada</button>
-            <button class="tab-btn" data-category="frias" onclick="filterMenu('frias', this)">Bebidas Frías</button>
-            <button class="tab-btn" data-category="calientes" onclick="filterMenu('calientes', this)">Calientes</button>
-            <button class="tab-btn" data-category="matcha" onclick="filterMenu('matcha', this)">Matcha</button>
-            <button class="tab-btn" data-category="especiales" onclick="filterMenu('especiales', this)">Especiales</button>
-            <button class="tab-btn" data-category="extras" onclick="filterMenu('extras', this)">Extras</button>
-        </div>
+        <section class="hours-section content-section" id="hours-section" aria-labelledby="hours-title">
+            <div class="section-heading">
+                <span class="eyebrow">Siempre hay un momento para un café</span>
+                <h2 id="hours-title">Te esperamos <em>con calma</em></h2>
+            </div>
+            <div class="hours-grid">
+                <article class="hours-card">
+                    <span class="hours-icon"><i class="fa-regular fa-sun" aria-hidden="true"></i></span>
+                    <strong>Lunes a viernes</strong>
+                    <span>8:00 am – 2:00 pm<br>4:30 pm – 9:00 pm</span>
+                </article>
+                <article class="hours-card">
+                    <span class="hours-icon"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i></span>
+                    <strong>Sábado</strong>
+                    <span>9:00 am – 2:00 pm<br>4:30 pm – 9:00 pm</span>
+                </article>
+                <article class="hours-card">
+                    <span class="hours-icon"><i class="fa-regular fa-moon" aria-hidden="true"></i></span>
+                    <strong>Domingo</strong>
+                    <span>10:00 am – 2:00 pm<br>5:00 pm – 9:00 pm</span>
+                </article>
+            </div>
+            <p class="store-status" id="store-status" aria-live="polite"></p>
+        </section>
 
-        <!-- Lista de Productos -->
-        <div class="products-grid" id="products-grid">
-            <!-- Inyectado por JavaScript -->
-        </div>
+        <section class="menu-container content-section" id="menu" aria-labelledby="menu-title">
+            <div class="section-heading menu-heading">
+                <span class="eyebrow">Tu próximo favorito</span>
+                <h2 id="menu-title">Un menú para <em>saborear</em></h2>
+                <p>Cafés, tés y pequeños momentos preparados para ti.</p>
+            </div>
+            <div class="menu-tabs" role="group" aria-label="Filtrar productos por categoría">
+                <button class="tab-btn active" type="button" data-category="todas" onclick="filterMenu('todas', this)">Todo</button>
+                <button class="tab-btn" type="button" data-category="temporada" onclick="filterMenu('temporada', this)">Temporada</button>
+                <button class="tab-btn" type="button" data-category="frias" onclick="filterMenu('frias', this)">Bebidas frías</button>
+                <button class="tab-btn" type="button" data-category="calientes" onclick="filterMenu('calientes', this)">Calientes</button>
+                <button class="tab-btn" type="button" data-category="matcha" onclick="filterMenu('matcha', this)">Matcha</button>
+                <button class="tab-btn" type="button" data-category="especiales" onclick="filterMenu('especiales', this)">Especiales</button>
+                <button class="tab-btn" type="button" data-category="extras" onclick="filterMenu('extras', this)">Extras</button>
+            </div>
+            <div class="products-grid" id="products-grid" aria-live="polite">
+                <!-- Productos renderizados por JavaScript -->
+            </div>
+        </section>
     </main>
 
     <!-- Modal para Seleccionar Opciones (Jarabes, etc.) -->
     <div class="cart-modal" id="options-modal">
         <div class="cart-content">
-            <span class="close-btn" onclick="closeOptionsModal()">&times;</span>
+            <button class="close-btn" type="button" aria-label="Cerrar personalización" onclick="closeOptionsModal()">&times;</button>
             <h3 id="modal-product-title">Confirma tu producto</h3>
-            <p id="modal-product-desc" style="font-size: 0.85rem; color: #666; margin-bottom: 1rem;"></p>
+            <p id="modal-product-desc" class="modal-description"></p>
             
-            <div id="options-container" style="margin-bottom: 1.5rem;">
+            <div id="options-container" class="options-container">
                 <!-- Opciones inyectadas dinámicamente -->
             </div>
 
-            <button class="whatsapp-btn" style="background-color: var(--dark-brown);" onclick="confirmAddToCart()">
+            <button class="whatsapp-btn confirm-btn" onclick="confirmAddToCart()">
                 Confirmar y agregar
             </button>
         </div>
@@ -106,27 +156,27 @@
     </div>
 
     <!-- Resumen del Pedido / Carrito Flotante -->
-  <div class="cart-floating" id="cart-floating" onclick="toggleCartModal()">
-        <i class="fa-solid fa-cart-shopping"></i>
+  <button class="cart-floating" id="cart-floating" type="button" onclick="toggleCartModal()" aria-label="Abrir carrito">
+        <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
         <span class="cart-count" id="cart-count">0</span>
-    </div>
+    </button>
     
     <!-- Modal del Carrito -->
     <div class="cart-modal" id="cart-modal">
         <div class="cart-content">
-            <span class="close-btn" onclick="toggleCartModal()">&times;</span>
+            <button class="close-btn" type="button" aria-label="Cerrar carrito" onclick="toggleCartModal()">&times;</button>
             <h3>Tu Pedido en Corner Latte House</h3>
             <div id="cart-items-list" class="cart-items-list">
                 <!-- Items seleccionados -->
             </div>
             <!-- Opciones de Envío / Recoger -->
-            <div class="delivery-options" style="margin: 1rem 0; font-size: 0.9rem;">
-                <label style="font-weight: 500; color: var(--dark-brown); display: block; margin-bottom: 0.5rem;">Método de entrega:</label>
-                <div style="display: flex; gap: 1rem; margin-bottom: 0.8rem;">
-                    <label style="cursor: pointer;"><input type="radio" name="deliveryType" value="domicilio" checked onchange="updateCartUI()"> Envío a domicilio</label>
-                    <label style="cursor: pointer;"><input type="radio" name="deliveryType" value="recoger" onchange="updateCartUI()"> Recoger en cafetería</label>
+            <div class="delivery-options">
+                <label class="form-section-label">Método de entrega:</label>
+                <div class="delivery-choices">
+                    <label><input type="radio" name="deliveryType" value="domicilio" checked onchange="updateCartUI()"> Envío a domicilio</label>
+                    <label><input type="radio" name="deliveryType" value="recoger" onchange="updateCartUI()"> Recoger en cafetería</label>
                 </div>
-                <div id="store-address" style="font-size: 0.8rem; color: #666; background: var(--primary-beige); padding: 0.5rem; border-radius: 6px; display: none;">
+                <div id="store-address" class="store-address">
                     📍 <strong>Ubicación:</strong>
                     <a href="https://www.google.com/maps/search/?api=1&amp;query=Justo+Sierra+52%2C+Guadalajarita%2C+28030+Colima%2C+Col." target="_blank" rel="noopener noreferrer">
                         Justo Sierra 52, Guadalajarita, 28030 Colima, Col.
@@ -172,6 +222,6 @@
         <p>&copy; 2026 Corner Latte House. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="script.js?v=3"></script>
+    <script src="script.js?v=4"></script>
 </body>
 </html>
