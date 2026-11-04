@@ -74,65 +74,65 @@ document.addEventListener("DOMContentLoaded", () => {
 // Sistema de Temporadas y Elementos Gráficos Flotantes Automáticos
 function checkSeasonAndTheme() {
     const now = new Date();
-    const month = now.getMonth() + 1; // 1 - 12
+    const mexicoDate = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Mexico_City",
+        month: "numeric",
+        day: "numeric"
+    }).formatToParts(now).map(part => [part.type, part.value]));
+    const month = Number(mexicoDate.month);
+    const day = Number(mexicoDate.day);
     const bannerText = document.getElementById("seasonal-text");
     const body = document.getElementById("body-theme");
     const themes = ["theme-halloween", "theme-muertos", "theme-revolucion", "theme-navidad", "theme-independencia", "theme-primavera", "theme-amor"];
     
     body.classList.remove(...themes);
 
-    const day = now.getDate();
     let icons = [];
 
     // Mostrar cada tema únicamente durante la semana previa y el día de la festividad.
     if (month === 10 && day >= 25) {
         body.classList.add("theme-halloween");
-        bannerText.innerHTML = "🎃 ¡Temporada de Halloween y Pumpkin Spice en Corner Latte House!";
-        icons = ['fa-spider', 'fa-ghost', 'fa-hat-wizard', 'fa-pumpkin'];
+        bannerText.textContent = "¡Temporada de Halloween y Pumpkin Spice en Corner Latte House!";
+        icons = ['fa-spider', 'fa-ghost', 'fa-star', 'fa-mug-hot'];
     } 
     // Día de Muertos: 1 al 3 de noviembre.
     else if (month === 11) {
         if (day <= 3) {
             body.classList.add("theme-muertos");
-            bannerText.innerHTML = "🕯️ Celebrando Día de Muertos. ¡Prueba nuestros especiales!";
-            icons = ['fa-skull', 'fa-fire', 'fa-leaf', 'fa-spa'];
+            bannerText.textContent = "Celebrando Día de Muertos. ¡Prueba nuestros especiales!";
+            icons = ['fa-spa', 'fa-sun', 'fa-leaf', 'fa-star'];
         } else if (day >= 14 && day <= 20) {
             body.classList.add("theme-revolucion");
-            bannerText.innerHTML = "🇲🇽 Conmemoramos la Revolución Mexicana en Corner Latte House.";
-            icons = ['fa-flag', 'fa-star', 'fa-horse'];
+            setMexicanBanner("Conmemoramos la Revolución Mexicana en Corner Latte House.");
+            icons = ['fa-star', 'fa-flag', 'fa-leaf'];
         }
     } 
     // Semana previa y día de Navidad.
     else if (month === 12 && day >= 19 && day <= 25) {
         body.classList.add("theme-navidad");
-        bannerText.innerHTML = "🎄 ¡Felices Fiestas! Ven a abrigarte con nuestras bebidas navideñas.";
-        icons = ['fa-snowflake', 'fa-gifts', 'fa-holly-berry', 'fa-tree'];
+        bannerText.textContent = "¡Felices Fiestas! Ven a abrigarte con nuestras bebidas navideñas.";
+        icons = ['fa-leaf', 'fa-star', 'fa-snowflake', 'fa-gift'];
     } 
     // Semana previa y Día de la Independencia (16 de septiembre).
     else if (month === 9 && day >= 10 && day <= 16) {
         body.classList.add("theme-independencia");
-        bannerText.innerHTML = "🇲🇽 ¡Viva México! Disfruta tu café patrio en Corner Latte House.";
-        icons = ['fa-bell', 'fa-flag', 'fa-star'];
+        setMexicanBanner("¡Viva México! Disfruta tu café patrio en Corner Latte House.");
+        icons = ['fa-flag', 'fa-star', 'fa-leaf'];
     } 
     // Semana del inicio de primavera.
     else if (month === 3 && day >= 17 && day <= 23) {
         body.classList.add("theme-primavera");
-        bannerText.innerHTML = "🌷 ¡Celebra el inicio de la Primavera con nosotros!";
-        icons = ['fa-seedling', 'fa-feather', 'fa-sun', 'fa-leaf'];
+        bannerText.textContent = "¡Celebra el inicio de la Primavera con nosotros!";
+        icons = ['fa-seedling', 'fa-leaf', 'fa-sun', 'fa-spa'];
     } 
     // Semana previa y Día del Amor y la Amistad.
     else if (month === 2 && day >= 8 && day <= 14) {
         body.classList.add("theme-amor");
-        bannerText.innerHTML = "💖 ¡Mes del Amor y la Amistad! Comparte un latte especial.";
-        icons = ['fa-heart', 'fa-mug-hot'];
+        bannerText.textContent = "¡Mes del Amor y la Amistad! Comparte un latte especial.";
+        icons = ['fa-heart', 'fa-spa', 'fa-mug-hot'];
     } 
     else {
-        bannerText.innerHTML = "✨ ¡Bienvenidos a Corner Latte House! Explora nuestro menú y bebidas del mes.";
-        icons = ['fa-mug-hot', 'fa-coffee'];
-    }
-
-    if (!icons.length) {
-        bannerText.innerHTML = "✨ ¡Bienvenidos a Corner Latte House! Explora nuestro menú y bebidas del mes.";
+        bannerText.textContent = "¡Bienvenidos a Corner Latte House! Explora nuestro menú y bebidas del mes.";
         icons = ['fa-mug-hot', 'fa-coffee'];
     }
 
@@ -143,6 +143,25 @@ function checkSeasonAndTheme() {
         ornament.className = `fa-solid ${icons[index % icons.length]} corner-ornament ${position}`;
         corners.appendChild(ornament);
     });
+}
+
+function setMexicanBanner(message) {
+    const bannerText = document.getElementById("seasonal-text");
+    const flag = document.createElement("span");
+    flag.className = "mexico-flag";
+    flag.setAttribute("role", "img");
+    flag.setAttribute("aria-label", "Bandera de México");
+    const greenStripe = document.createElement("span");
+    greenStripe.className = "mexico-flag-green";
+    const whiteStripe = document.createElement("span");
+    whiteStripe.className = "mexico-flag-white";
+    const emblem = document.createElement("span");
+    emblem.className = "mexico-flag-emblem";
+    whiteStripe.appendChild(emblem);
+    const redStripe = document.createElement("span");
+    redStripe.className = "mexico-flag-red";
+    flag.append(greenStripe, whiteStripe, redStripe);
+    bannerText.replaceChildren(flag, document.createTextNode(` ${message}`));
 }
 
 // Configuración de Promociones por Día de la Semana

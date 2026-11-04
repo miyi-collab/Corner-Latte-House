@@ -81,7 +81,7 @@ textarea:focus-visible {
     position: absolute;
     color: var(--seasonal-accent);
     font-size: clamp(1.4rem, 3vw, 2.4rem);
-    opacity: 0.28;
+    opacity: 0.2;
     filter: drop-shadow(0 3px 6px rgba(61, 41, 31, 0.12));
     animation: cornerFloat 5s ease-in-out infinite alternate;
 }
@@ -99,6 +99,7 @@ textarea:focus-visible {
 .seasonal-banner {
     position: relative;
     z-index: 31;
+    overflow: hidden;
     padding: 0.45rem 1rem;
     background: var(--seasonal-accent);
     color: var(--color-espresso);
@@ -108,13 +109,13 @@ textarea:focus-visible {
     text-align: center;
 }
 
-body.theme-halloween { --seasonal-accent: #D98758; --seasonal-wash: #F4E3D4; }
-body.theme-muertos { --seasonal-accent: #CF9366; --seasonal-wash: #F4E7D2; }
-body.theme-revolucion { --seasonal-accent: #B98C70; --seasonal-wash: #F2E6D8; }
-body.theme-navidad { --seasonal-accent: #C38D7D; --seasonal-wash: #F4E4DF; }
-body.theme-independencia { --seasonal-accent: #B6A17C; --seasonal-wash: #F1E9D7; }
-body.theme-primavera { --seasonal-accent: #D0A08C; --seasonal-wash: #F5E9DF; }
-body.theme-amor { --seasonal-accent: #CE998E; --seasonal-wash: #F5E8E2; }
+body.theme-halloween { --seasonal-accent: #C68A59; --seasonal-wash: #F5EEE4; }
+body.theme-muertos { --seasonal-accent: #C68A59; --seasonal-wash: #F5EEE2; }
+body.theme-revolucion { --seasonal-accent: #A77D61; --seasonal-wash: #F3EDE4; }
+body.theme-navidad { --seasonal-accent: #A87568; --seasonal-wash: #F4ECE5; }
+body.theme-independencia { --seasonal-accent: #9B8061; --seasonal-wash: #F3EEE3; }
+body.theme-primavera { --seasonal-accent: #B98D76; --seasonal-wash: #F5EEE7; }
+body.theme-amor { --seasonal-accent: #B9827B; --seasonal-wash: #F5ECE8; }
 
 .site-header {
     position: sticky;
@@ -1565,5 +1566,162 @@ footer p {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+/* Boutique finish: softer cards and controls, with the original palette intact. */
+.hero-cta,
+.promotion-button,
+.add-btn,
+.whatsapp-btn {
+    border-radius: 999px;
+}
+
+.hero-visual {
+    border-radius: 22px;
+}
+
+.promotion-option {
+    border-radius: 18px;
+}
+
+.hours-card {
+    border-radius: 16px;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.cart-content,
+.closed-content {
+    border-radius: 22px;
+}
+
+.option-select,
+.customer-address-field textarea,
+.schedule-field input,
+.quantity-input {
+    border-radius: 10px;
+}
+
+.product-photo {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-image-placeholder.has-photo::before,
+.product-image-placeholder.has-photo::after {
+    display: none;
+}
+
+.seasonal-banner::before,
+.seasonal-banner::after {
+    position: absolute;
+    top: 50%;
+    color: var(--color-espresso);
+    font-size: 0.9rem;
+    line-height: 1;
+    opacity: 0.62;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.seasonal-banner::before {
+    left: max(1rem, calc((100% - var(--page-width)) / 2));
+}
+
+.seasonal-banner::after {
+    right: max(1rem, calc((100% - var(--page-width)) / 2));
+}
+
+body.theme-navidad .seasonal-banner::before,
+body.theme-navidad .seasonal-banner::after { content: "\2726"; color: #536B50; }
+body.theme-navidad .seasonal-banner {
+    border-top: 1px solid rgba(83, 107, 80, 0.38);
+    border-bottom: 1px solid rgba(151, 83, 70, 0.38);
+}
+body.theme-muertos .seasonal-banner::before,
+body.theme-muertos .seasonal-banner::after { content: "\273F"; color: #9B542F; }
+body.theme-halloween .seasonal-banner::before,
+body.theme-halloween .seasonal-banner::after { content: "\2726"; color: #87512F; }
+body.theme-revolucion .seasonal-banner::before,
+body.theme-revolucion .seasonal-banner::after { content: "\2605"; color: #69714B; }
+body.theme-amor .seasonal-banner::before,
+body.theme-amor .seasonal-banner::after { content: "\2661"; color: #945F65; }
+body.theme-independencia .seasonal-banner::before,
+body.theme-independencia .seasonal-banner::after { content: "\2726"; color: #66734D; }
+body.theme-independencia .seasonal-banner {
+    border-top: 1px solid rgba(89, 113, 73, 0.4);
+    border-bottom: 1px solid rgba(157, 77, 65, 0.4);
+}
+body.theme-primavera .seasonal-banner::before,
+body.theme-primavera .seasonal-banner::after { content: "\273F"; color: #8D7458; }
+
+.hero-section::after {
+    position: absolute;
+    z-index: 0;
+    right: 4%;
+    bottom: 8%;
+    color: var(--seasonal-accent);
+    font-size: 1.6rem;
+    opacity: 0.34;
+    pointer-events: none;
+}
+
+body.theme-navidad .hero-section::after { content: "\2726"; color: #536B50; }
+body.theme-muertos .hero-section::after { content: "\273F"; color: #B76B39; }
+body.theme-halloween .hero-section::after { content: "\2726"; color: #87512F; }
+body.theme-revolucion .hero-section::after { content: "\2605"; color: #69714B; }
+body.theme-amor .hero-section::after { content: "\2661"; color: #945F65; }
+body.theme-independencia .hero-section::after { content: "\2726"; color: #66734D; }
+body.theme-primavera .hero-section::after { content: "\273F"; color: #8D7458; }
+
+.mexico-flag {
+    display: inline-flex;
+    width: 1.15rem;
+    height: 0.78rem;
+    margin-right: 0.35rem;
+    overflow: hidden;
+    vertical-align: -0.08em;
+    border: 1px solid rgba(61, 41, 31, 0.16);
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(61, 41, 31, 0.12);
+}
+
+.mexico-flag > span {
+    position: relative;
+    width: 33.333%;
+}
+
+.mexico-flag-green { background: #176B45; }
+.mexico-flag-white { display: grid; place-items: center; background: #FFFCF7; }
+.mexico-flag-red { background: #C54843; }
+
+.mexico-flag-emblem {
+    width: 0.23rem;
+    height: 0.3rem;
+    border: 1px solid #9A7A3D;
+    border-radius: 50% 50% 35% 35%;
+    background: #8F713C;
+}
+
+@media (max-width: 680px) {
+    .seasonal-banner::before { left: 0.55rem; }
+    .seasonal-banner::after { right: 0.55rem; }
+
+    .seasonal-corners .corner-ornament {
+        font-size: 1.25rem;
+        opacity: 0.14;
     }
 }
